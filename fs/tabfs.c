@@ -443,21 +443,25 @@ static const struct fuse_operations tabfs_ops = {
     .mknod = tabfs_mknod,
 };
 
+void usage(char * name){
+    eprintln("usage: %s <mounting-pount> [<log-file default:/tmp/tabfs.log>]", name);
+}
+
 int main(int argc, char **argv) {
     (void)argc;
     
     char * log_file;
     
     if (argc < 1) {
-      fprintf(stderr, "%s", "argc < 1 u dumbfuck");   
+      usage(argv[0]);
       return 64;
     }
 
     const char * mount_dir = argv[1];
-    
+
     if (argc == 1) {
-      fprintf(stderr, "%s", "/tmp/tabfs_logfile.txt");   
-      log_file = "/tmp/tabfs_logfile.txt";
+        log_file = "/tmp/tabfs.log";
+        eprintln("Using default logfile: %s", log_file);
     }
 
     if (argc >= 2) {
