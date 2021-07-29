@@ -131,7 +131,6 @@ static int do_exchange(unsigned int id,
 }
 
 static void *reader_main(void *ud) {
-    (void)ud;
     for (;;) {
         uint32_t size_4bytes;
         read_or_die(STDIN_FILENO, &size_4bytes, sizeof(size_4bytes));
@@ -423,7 +422,7 @@ static int tabfs_mknod(const char *path, mode_t mode, dev_t rdev) {
     return 0;
 }
 
-static const struct fuse_operations tabfs_oper = {
+static const struct fuse_operations tabfs_ops = {
     .getattr  = tabfs_getattr,
     .readlink = tabfs_readlink,
 
@@ -445,11 +444,31 @@ static const struct fuse_operations tabfs_oper = {
 
 int main(int argc, char **argv) {
     (void)argc;
-    if (NULL == getenv("TABFS_MOUNT_DIR")) {
-        setenv("TABFS_MOUNT_DIR", "mnt", 1);
+    
+    char * log_file;
+    
+    if (argc < 1) {
+      fprintf(stderr, "%s", "argc < 1 u dumbfuck");   
+      return 64;
     }
 
-    freopen("log.txt", "a", stderr);
+    const char * mount_dir = argv[1];
+    
+    if (argc == 1) {
+      fprintf(stderr, "%s", "/tmp/tabfs_logfile.txt");   
+      log_file = "/tmp/tabfs_logfile.txt";
+    }
+
+    if (argc >= 2) {
+      log_file = argv[2];
+    }
+
+    
+    if (NULL == getenv("TABFS_MOUNT_DIR")) {
+        setenv("TABFS_MOUNT_DIR", mount_dir, 1);
+    }
+
+    freopen(log_file, "a", stderr);
     setvbuf(stderr, NULL, _IONBF, 0);
 
     char killcmd[128];
@@ -490,6 +509,6 @@ int main(int argc, char **argv) {
     return fuse_main(
         (sizeof(fuse_argv)/sizeof(*fuse_argv))-1,
         (char **)&fuse_argv,
-        &tabfs_oper,
+        &tabfs_ops,
         NULL);
 }
