@@ -131,6 +131,7 @@ static int do_exchange(unsigned int id,
 }
 
 static void *reader_main(void *ud) {
+    (void) ud;
     for (;;) {
         uint32_t size_4bytes;
         read_or_die(STDIN_FILENO, &size_4bytes, sizeof(size_4bytes));
